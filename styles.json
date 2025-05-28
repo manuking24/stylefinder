@@ -1,0 +1,279 @@
+{
+    "styles": [
+        {
+            "name": "3000",
+            "dia": "20",
+            "size": "AMD"
+        },
+        {
+            "name": "3000",
+            "dia": "22",
+            "size": "ALG"
+        },
+        {
+            "name": "3000",
+            "dia": "26",
+            "size": "A2X"
+        },
+        {
+            "name": "8800",
+            "dia": "23",
+            "size": "ALG"
+        },
+        {
+            "name": "63000",
+            "dia": "20",
+            "size": "AMD"
+        },
+        {
+            "name": "64000",
+            "dia": "18",
+            "size": "ASM"
+        },
+        {
+            "name": "64000",
+            "dia": "20",
+            "size": "AMD"
+        },
+        {
+            "name": "64000",
+            "dia": "22",
+            "size": "ALG"
+        },
+        {
+            "name": "64000",
+            "dia": "24",
+            "size": "AXL"
+        },
+        {
+            "name": "64000",
+            "dia": "26",
+            "size": "A2X"
+        },
+        {
+            "name": "64800",
+            "dia": "24",
+            "size": "ALG"
+        },
+        {
+            "name": "65000",
+            "dia": "22",
+            "size": "ALG"
+        },
+        {
+            "name": "67000",
+            "dia": "24",
+            "size": "AXL"
+        },
+        {
+            "name": "76000",
+            "dia": "18",
+            "size": "ASM"
+        },
+        {
+            "name": "3000B",
+            "dia": "18",
+            "size": "BMD"
+        },
+        {
+            "name": "3000B",
+            "dia": "19",
+            "size": "BLG"
+        },
+        {
+            "name": "64000 Amz",
+            "dia": "22",
+            "size": "ALG"
+        },
+        {
+            "name": "64000B",
+            "dia": "17",
+            "size": "BMD"
+        },
+        {
+            "name": "64000B",
+            "dia": "19",
+            "size": "BXL"
+        },
+        {
+            "name": "65000B",
+            "dia": "17",
+            "size": "BMD"
+        },
+        {
+            "name": "G1100",
+            "dia": "18",
+            "size": "MSM"
+        },
+        {
+            "name": "G1100",
+            "dia": "20",
+            "size": "MMD"
+        },
+        {
+            "name": "G1100",
+            "dia": "22",
+            "size": "MLG"
+        },
+        {
+            "name": "G1100",
+            "dia": "26",
+            "size": "2XL"
+        },
+        {
+            "name": "G1100GE",
+            "dia": "20",
+            "size": "AMD"
+        },
+        {
+            "name": "G1100GE",
+            "dia": "22",
+            "size": "MLG"
+        },
+        {
+            "name": "G1100GE",
+            "dia": "23",
+            "size": "MXL"
+        },
+        {
+            "name": "G1100GE",
+            "dia": "24",
+            "size": "MXL"
+        },
+        {
+            "name": "G1100OPP",
+            "dia": "17",
+            "size": "MSM"
+        },
+        {
+            "name": "G1100OPP",
+            "dia": "19",
+            "size": "MMD"
+        },
+        {
+            "name": "G1100OPP",
+            "dia": "21.5",
+            "size": "MLG"
+        },
+        {
+            "name": "G1100OPP",
+            "dia": "23.5",
+            "size": "AXL"
+        },
+        {
+            "name": "G1103",
+            "dia": "20",
+            "size": "MMD"
+        },
+        {
+            "name": "G1103",
+            "dia": "24",
+            "size": "MXL"
+        },
+        {
+            "name": "G1104",
+            "dia": "10",
+            "size": "MSM"
+        },
+        {
+            "name": "G1104",
+            "dia": "11",
+            "size": "MMD"
+        },
+        {
+            "name": "G1104",
+            "dia": "12",
+            "size": "MLG"
+        },
+        {
+            "name": "G1104",
+            "dia": "13",
+            "size": "MXL"
+        },
+        {
+            "name": "G1104",
+            "dia": "14",
+            "size": "M2X"
+        },
+        {
+            "name": "G1104GE",
+            "dia": "10",
+            "size": "MSM"
+        },
+        {
+            "name": "G1104GE",
+            "dia": "11",
+            "size": "MMD"
+        },
+        {
+            "name": "G1104GE",
+            "dia": "13",
+            "size": "MXL"
+        },
+        {
+            "name": "G1104GE",
+            "dia": "14",
+            "size": "M2X"
+        },
+        {
+            "name": "GM2900",
+            "dia": "24",
+            "size": "MLG"
+        },
+        {
+            "name": "GM2900",
+            "dia": "25.5",
+            "size": "MXL"
+        },
+        {
+            "name": "H000",
+            "dia": "24",
+            "size": "AXL"
+        },
+        {
+            "name": "H000",
+            "dia": "26",
+            "size": "A2X"
+        },
+        {
+            "name": "SF500",
+            "dia": "20",
+            "size": "AMD"
+        },
+        {
+            "name": "SF500",
+            "dia": "22",
+            "size": "AXL"
+        },
+        {
+            "name": "SF500",
+            "dia": "24",
+            "size": "ALG"
+        },
+        {
+            "name": "SF500",
+            "dia": "26",
+            "size": "AXL"
+        },
+        {
+            "name": "SF500",
+            "dia": "28",
+            "size": "A2X"
+        },
+        {
+            "name": "SF500",
+            "dia": "30",
+            "size": "A3X"
+        },
+        {
+            "name": "SF500B",
+            "dia": "22",
+            "size": "BLG"
+        },
+        {
+            "name": "SF500B",
+            "dia": "22.5",
+            "size": "BXL"
+        }
+    ]
+  }

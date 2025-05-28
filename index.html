@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Style Search</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">Style Finder</h1>
+            <p class="text-gray-600 text-lg">Discover your perfect clothing styles</p>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600"></div>
+            <p class="mt-4 text-gray-600 text-lg">Loading styles...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="hidden text-center py-8">
+            <div class="bg-red-50 border border-red-200 rounded-xl p-8 max-w-md mx-auto shadow-lg">
+                <svg class="w-16 h-16 mx-auto mb-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="text-xl font-semibold text-red-800 mb-3">Failed to Load Styles</h3>
+                <p class="text-red-600 mb-6">Unable to fetch styles from the server. Please check if the styles.json file exists.</p>
+                <button id="retryBtn" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition duration-200 font-semibold">
+                    Retry Loading
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="mainContent" class="hidden">
+            <!-- Search Section -->
+            <div class="max-w-2xl mx-auto mb-8">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search for styles (e.g., casual, formal, vintage)..."
+                        class="w-full px-6 py-4 pl-14 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400 transition duration-200 bg-white shadow-sm"
+                    >
+                    <div class="absolute left-5 top-1/2 transform -translate-y-1/2">
+                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <button 
+                    id="searchBtn" 
+                    class="w-full mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-8 rounded-xl hover:from-blue-700 hover:to-purple-700 transition duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                >
+                    Search Styles
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsContainer" class="max-w-6xl mx-auto">
+                <!-- Initial message -->
+                <div id="initialMessage" class="text-center text-gray-500 py-12">
+                    <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                        <svg class="w-20 h-20 mx-auto mb-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <p class="text-xl font-medium text-gray-700 mb-2">Start typing to search for styles</p>
+                        <p class="text-base text-gray-500">Loaded <span id="totalStyles" class="font-semibold text-blue-600">0</span> styles from database</p>
+                    </div>
+                </div>
+
+                <!-- Results will be displayed here -->
+                <div id="results" class="hidden"></div>
+                
+                <!-- No results message -->
+                <div id="noResults" class="hidden text-center text-gray-500 py-12">
+                    <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                        <svg class="w-20 h-20 mx-auto mb-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.084-2.291.414-.9.858-1.74 1.237-2.486A7.967 7.967 0 0112 9c2.74 0 5.23 1.377 6.678 3.678z"></path>
+                        </svg>
+                        <p class="text-xl font-semibold text-gray-700 mb-2">No styles found</p>
+                        <p class="text-base text-gray-500">Try searching for different keywords</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let stylesDatabase = [];
+        let currentSort = { column: null, direction: 'asc' };
+
+        // DOM elements
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const errorMessage = document.getElementById('errorMessage');
+        const mainContent = document.getElementById('mainContent');
+        const retryBtn = document.getElementById('retryBtn');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const initialMessage = document.getElementById('initialMessage');
+        const results = document.getElementById('results');
+        const noResults = document.getElementById('noResults');
+        const totalStyles = document.getElementById('totalStyles');
+
+       
+
+        // Fetch styles from JSON file
+        async function fetchStyles() {
+            try {
+                showLoadingState();
+                
+                // Try to fetch the JSON file, fall back to sample data for demo
+                try {
+                    const response = await fetch('styles.json');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    stylesDatabase = data.styles;
+                } catch (fetchError) {
+                    // Use sample data for demonstration
+                    console.log('Using sample data for demonstration');
+                    stylesDatabase = sampleData.styles;
+                }
+                
+                // Update UI
+                totalStyles.textContent = stylesDatabase.length;
+                showMainContent();
+                
+                console.log(`Successfully loaded ${stylesDatabase.length} styles`);
+                
+            } catch (error) {
+                console.error('Error fetching styles:', error);
+                showErrorState(error.message);
+            }
+        }
+
+        // Show loading state
+        function showLoadingState() {
+            loadingIndicator.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            mainContent.classList.add('hidden');
+        }
+
+        // Show error state
+        function showErrorState(errorMsg) {
+            loadingIndicator.classList.add('hidden');
+            errorMessage.classList.remove('hidden');
+            mainContent.classList.add('hidden');
+        }
+
+        // Show main content
+        function showMainContent() {
+            loadingIndicator.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+        }
+
+        // Sort function
+        function sortStyles(styles, column, direction) {
+            return [...styles].sort((a, b) => {
+                let aVal = a[column].toString().toLowerCase();
+                let bVal = b[column].toString().toLowerCase();
+                
+                if (direction === 'asc') {
+                    return aVal.localeCompare(bVal);
+                } else {
+                    return bVal.localeCompare(aVal);
+                }
+            });
+        }
+
+        // Handle column sorting
+        function handleSort(column) {
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'asc';
+            }
+            
+            // Re-search with current input to apply sorting
+            const query = searchInput.value;
+            searchStyles(query);
+        }
+
+        // Search function
+        function searchStyles(query) {
+            if (!query.trim()) {
+                showInitialMessage();
+                return;
+            }
+
+            const searchTerm = query.toString().toLowerCase().trim();
+            let matchedStyles = stylesDatabase.filter(style => {
+                return style.name.toString().toLowerCase().includes(searchTerm) ||
+                       style.dia.toString().toLowerCase().includes(searchTerm) ||
+                       style.size.toString().toLowerCase().includes(searchTerm);
+            });
+
+            // Apply sorting if set
+            if (currentSort.column) {
+                matchedStyles = sortStyles(matchedStyles, currentSort.column, currentSort.direction);
+            }
+
+            displayResults(matchedStyles);
+        }
+
+        // Get sort icon HTML
+        function getSortIcon(column) {
+            if (currentSort.column !== column) {
+                return `<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+                </svg>`;
+            }
+            
+            if (currentSort.direction === 'asc') {
+                return `<svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                </svg>`;
+            } else {
+                return `<svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>`;
+            }
+        }
+
+        // Display search results as enhanced table
+        function displayResults(styles) {
+            hideAllSections();
+            
+            if (styles.length === 0) {
+                noResults.classList.remove('hidden');
+                return;
+            }
+
+            results.classList.remove('hidden');
+            results.innerHTML = `
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                            Found ${styles.length} style${styles.length > 1 ? 's' : ''}
+                        </h2>
+                        <div class="text-sm text-gray-500 bg-white px-4 py-2 rounded-full shadow-sm border">
+                            ${styles.length} of ${stylesDatabase.length} total
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Desktop Table View -->
+                <div class="hidden md:block bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200">
+                                <tr>
+                                    <th class="px-8 py-6 text-left">
+                                        <button onclick="handleSort('name')" class="flex items-center space-x-2 text-xs font-bold text-gray-700 uppercase tracking-wider hover:text-blue-600 transition duration-200 group">
+                                            <span>Style Name</span>
+                                            ${getSortIcon('name')}
+                                        </button>
+                                    </th>
+                                    <th class="px-8 py-6 text-left">
+                                        <button onclick="handleSort('dia')" class="flex items-center space-x-2 text-xs font-bold text-gray-700 uppercase tracking-wider hover:text-blue-600 transition duration-200 group">
+                                            <span>Diameter</span>
+                                            ${getSortIcon('dia')}
+                                        </button>
+                                    </th>
+                                    <th class="px-8 py-6 text-left">
+                                        <button onclick="handleSort('size')" class="flex items-center space-x-2 text-xs font-bold text-gray-700 uppercase tracking-wider hover:text-blue-600 transition duration-200 group">
+                                            <span>Size</span>
+                                            ${getSortIcon('size')}
+                                        </button>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-100">
+                                ${styles.map((style, index) => `
+                                    <tr class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 group cursor-pointer">
+                                        <td class="px-8 py-6 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mr-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                                                <div class="text-base font-semibold text-gray-900 group-hover:text-blue-700 transition duration-200">${style.name}</div>
+                                            </div>
+                                        </td>
+                                        <td class="px-8 py-6 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-800 group-hover:bg-blue-100 group-hover:text-blue-800 transition duration-200">
+                                                ${style.dia}
+                                            </span>
+                                        </td>
+                                        <td class="px-8 py-6 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 group-hover:from-purple-200 group-hover:to-blue-200 transition duration-200">
+                                                ${style.size}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Mobile Card View -->
+                <div class="md:hidden space-y-4">
+                    ${styles.map((style, index) => `
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                            <div class="p-6">
+                                <div class="flex items-start justify-between mb-4">
+                                    <h3 class="text-xl font-bold text-gray-900 mb-2">${style.name}</h3>
+                                    <div class="w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-sm font-medium text-gray-500 w-20">Diameter:</span>
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                            ${style.dia}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-sm font-medium text-gray-500 w-20">Size:</span>
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800">
+                                            ${style.size}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Show initial message
+        function showInitialMessage() {
+            hideAllSections();
+            initialMessage.classList.remove('hidden');
+        }
+
+        // Hide all result sections
+        function hideAllSections() {
+            initialMessage.classList.add('hidden');
+            results.classList.add('hidden');
+            noResults.classList.add('hidden');
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchStyles();
+        });
+
+        retryBtn.addEventListener('click', () => {
+            fetchStyles();
+        });
+
+        searchBtn.addEventListener('click', () => {
+            const query = searchInput.value;
+            searchStyles(query);
+        });
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value;
+                searchStyles(query);
+            }
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value;
+            if (query.length >= 2) {
+                searchStyles(query);
+            } else if (query.length === 0) {
+                showInitialMessage();
+                currentSort = { column: null, direction: 'asc' }; // Reset sorting
+            }
+        });
+
+        // Make handleSort globally available
+        window.handleSort = handleSort;
+    </script>
+</body>
+</html>
